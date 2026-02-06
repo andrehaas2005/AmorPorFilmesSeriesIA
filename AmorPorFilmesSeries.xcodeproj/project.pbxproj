@@ -235,8 +235,8 @@
 			packageReferences = (
 				79BB40752DE818EF00804CB4 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				79BB407D2DE8206700804CB4 /* XCRemoteSwiftPackageReference "SnapKit" */,
-				79E0443B2DE8F56E00E1D2F9 /* XCRemoteSwiftPackageReference "ModuloServiceSeries" */,
-				79E0443C2DE8F61F00E1D2F9 /* XCRemoteSwiftPackageReference "ModuloServiceMovie" */,
+				7967B1802F3691E80097A606 /* XCLocalSwiftPackageReference "../Estudos/Projetos Filmes Series/ModuloServiceSeries" */,
+				7967B1812F3692060097A606 /* XCLocalSwiftPackageReference "../Estudos/Projetos Filmes Series/ModuloServiceMovie" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 79BB3F9E2DE7D30800804CB4 /* Products */;
@@ -355,9 +355,13 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.andrehaas.AmorPorFilmesSeries;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -382,9 +386,13 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.andrehaas.AmorPorFilmesSeries;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -622,6 +630,17 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		7967B1802F3691E80097A606 /* XCLocalSwiftPackageReference "../Estudos/Projetos Filmes Series/ModuloServiceSeries" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../Estudos/Projetos Filmes Series/ModuloServiceSeries";
+		};
+		7967B1812F3692060097A606 /* XCLocalSwiftPackageReference "../Estudos/Projetos Filmes Series/ModuloServiceMovie" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../Estudos/Projetos Filmes Series/ModuloServiceMovie";
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		79BB40752DE818EF00804CB4 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -637,22 +656,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 5.0.0;
-			};
-		};
-		79E0443B2DE8F56E00E1D2F9 /* XCRemoteSwiftPackageReference "ModuloServiceSeries" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/andrehaas2005/ModuloServiceSeries.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
-		79E0443C2DE8F61F00E1D2F9 /* XCRemoteSwiftPackageReference "ModuloServiceMovie" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/andrehaas2005/ModuloServiceMovie.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
