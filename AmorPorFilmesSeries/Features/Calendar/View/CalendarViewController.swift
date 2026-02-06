@@ -222,3 +222,157 @@ extension CalendarViewController: UITableViewDataSource, UITableViewDelegate {
         return cell
     }
 }
+
+class DateCell: UICollectionViewCell {
+    private let dayLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 10, weight: .bold)
+        label.textAlignment = .center
+        return label
+    }()
+
+    private let dateLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
+        label.textAlignment = .center
+        return label
+    }()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        contentView.layer.cornerRadius = 12
+        contentView.addSubview(dayLabel)
+        contentView.addSubview(dateLabel)
+        dayLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(12)
+            make.leading.trailing.equalToSuperview()
+        }
+        dateLabel.snp.makeConstraints { make in
+            make.top.equalTo(dayLabel.snp.bottom).offset(4)
+            make.leading.trailing.equalToSuperview()
+        }
+    }
+
+    required init?(coder: NSCoder) { fatalError() }
+
+    func configure(day: String, date: String, isSelected: Bool) {
+        dayLabel.text = day
+        dateLabel.text = date
+        contentView.backgroundColor = isSelected ? Color.primary : Color.surface.withAlphaComponent(0.4)
+        dayLabel.textColor = isSelected ? .white.withAlphaComponent(0.8) : .gray
+        dateLabel.textColor = isSelected ? .white : .white
+    }
+}
+
+class TimelineCell: UITableViewCell {
+    private let timeLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        label.textColor = .gray
+        return label
+    }()
+
+    private let dotView: UIView = {
+        let view = UIView()
+        view.layer.cornerRadius = 18
+        view.backgroundColor = .darkGray
+        return view
+    }()
+
+    private let lineView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.white.withAlphaComponent(0.1)
+        return view
+    }()
+
+    private let cardView: UIView = {
+        let view = UIView()
+        view.backgroundColor = Color.surface.withAlphaComponent(0.4)
+        view.layer.cornerRadius = 16
+        view.layer.borderWidth = 1
+        view.layer.borderColor = UIColor.white.withAlphaComponent(0.1).cgColor
+        return view
+    }()
+
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 14, weight: .bold)
+        label.textColor = .white
+        return label
+    }()
+
+    private let episodeLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 12)
+        label.textColor = .gray
+        return label
+    }()
+
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        backgroundColor = .clear
+        selectionStyle = .none
+        setupUI()
+    }
+
+    required init?(coder: NSCoder) { fatalError() }
+
+    private func setupUI() {
+        contentView.addSubview(lineView)
+        contentView.addSubview(dotView)
+        contentView.addSubview(timeLabel)
+        contentView.addSubview(cardView)
+
+        cardView.addSubview(titleLabel)
+        cardView.addSubview(episodeLabel)
+
+        dotView.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(8)
+            make.leading.equalToSuperview().offset(16)
+            make.width.height.equalTo(36)
+        }
+
+        lineView.snp.makeConstraints { make in
+            make.centerX.equalTo(dotView)
+            make.top.bottom.equalToSuperview()
+            make.width.equalTo(2)
+        }
+
+        timeLabel.snp.makeConstraints { make in
+            make.top.equalTo(dotView).offset(8)
+            make.leading.equalTo(dotView.snp.trailing).offset(16)
+        }
+
+        cardView.snp.makeConstraints { make in
+            make.top.equalTo(timeLabel.snp.bottom).offset(12)
+            make.leading.equalTo(timeLabel)
+            make.trailing.equalToSuperview().offset(-16)
+            make.bottom.equalToSuperview().offset(-24)
+        }
+
+        titleLabel.snp.makeConstraints { make in
+            make.top.leading.equalToSuperview().offset(16)
+        }
+
+        episodeLabel.snp.makeConstraints { make in
+            make.top.equalTo(titleLabel.snp.bottom).offset(4)
+            make.leading.equalTo(titleLabel)
+            make.bottom.equalToSuperview().offset(-16)
+        }
+    }
+
+    func configure(title: String, episode: String, time: String, isFirst: Bool, isLast: Bool) {
+        titleLabel.text = title
+        episodeLabel.text = episode
+        timeLabel.text = time
+        if isFirst {
+            dotView.backgroundColor = Color.primary
+            if #available(iOS 13.0, *) {
+                let icon = UIImageView(image: UIImage(systemName: "bell.fill"))
+                icon.tintColor = .white
+                dotView.addSubview(icon)
+                icon.snp.makeConstraints { make in make.center.equalToSuperview(); make.width.height.equalTo(18) }
+            }
+        }
+    }
+}
