@@ -38,6 +38,8 @@ class CalendarViewController: UIViewController {
         return tv
     }()
 
+    private var timelineTableViewHeightConstraint: Constraint?
+
     init(viewModel: CalendarViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -52,6 +54,11 @@ class CalendarViewController: UIViewController {
         setupUI()
         setupCollections()
         setupBindings()
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        updateTableViewHeight()
     }
 
     private func setupNavigation() {
@@ -145,7 +152,7 @@ class CalendarViewController: UIViewController {
         timelineTableView.snp.makeConstraints { make in
             make.top.equalTo(todayDate.snp.bottom).offset(24)
             make.leading.trailing.bottom.equalToSuperview()
-            make.height.equalTo(600)
+            self.timelineTableViewHeightConstraint = make.height.equalTo(0).priority(.low).constraint
         }
     }
 
@@ -163,8 +170,16 @@ class CalendarViewController: UIViewController {
             DispatchQueue.main.async { self?.dateSelectorCollectionView.reloadData() }
         }
         viewModel.releases.bind { [weak self] _ in
-            DispatchQueue.main.async { self?.timelineTableView.reloadData() }
+            DispatchQueue.main.async {
+                self?.timelineTableView.reloadData()
+                self?.updateTableViewHeight()
+            }
         }
+    }
+
+    private func updateTableViewHeight() {
+        timelineTableView.layoutIfNeeded()
+        timelineTableViewHeightConstraint?.update(offset: timelineTableView.contentSize.height)
     }
 
     private func createSectionLabel(_ title: String) -> UILabel {
