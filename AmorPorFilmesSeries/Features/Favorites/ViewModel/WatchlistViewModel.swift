@@ -1,61 +1,37 @@
 //
-//  HomeViewModel.swift
+//  WatchlistViewModel.swift
 //  AmorPorFilmesSeries
 //
-//  Created by Andre  Haas on 03/06/25.
-//
 
-
-//
-//  Observable.swift
-//  PaixaoPorFilmesESeries
-//
-//  Created by Andre  Haas on 28/05/25.
-//
-
-
-// Features/Home/ViewModel/HomeViewModel.swift
 import Foundation
 import ModuloServiceMovie
 
-
-
 public class WatchlistViewModel {
-    // Propriedades observáveis para os dados da UI
-    let nowPlayingMovies = Observable<[Movie]?>(nil)
-    let upcomingMovies = Observable<[Movie]?>(nil)
-    let famousActors = Observable<[Actor]?>(nil)
-    let recentlyWatchedMovies = Observable<[Movie]?>(nil)
-    let lastWatchedSeriesEpisodes = Observable<[Serie]?>(nil)
     
-    let isLoading = Observable<Bool>(false)
-    let errorMessage = Observable<String?>(nil)
+    var items: Observable<[(title: String, rating: String, image: String?)]> = Observable([])
+    var isLoading = Observable<Bool>(false)
+    var errorMessage = Observable<String?>(nil)
     
-    weak var coordinator: WatchlistCoordinator? // Referência fraca ao coordenador
+    weak var coordinator: WatchlistCoordinator?
     
-    
-    // Injeção de dependência dos serviços
     init(coordinator: WatchlistCoordinator) {
         self.coordinator = coordinator
+        fetchData()
     }
     
-    /// Busca todos os dados necessários para a tela Home.
-    func fetchHomeData() {
-
+    func fetchData() {
+        // Mock data
+        items.value = [
+            ("Interestelar", "9.5", nil),
+            ("O Poderoso Chefão", "8.8", nil),
+            ("Spider-Man", "9.2", nil),
+            ("Pulp Fiction", "8.0", nil),
+            ("Blade Runner 2049", "9.0", nil),
+            ("Breaking Bad", "9.8", nil)
+        ]
     }
     
-    /// Notifica o coordenador que um filme foi selecionado.
-    func didSelectMovie(_ movie: Movie) {
-        print(movie.title)
-    }
-    
-    /// Notifica o coordenador que uma série foi selecionada.
-    func didSelectSerie(_ serie: Serie) {
-        print(serie.name)
-    }
-    
-    /// Notifica o coordenador que um ator foi selecionado.
-    func didSelectActor(_ actor: Actor) {
-        print(actor.name)
+    func didSelectMovie(at index: Int) {
+        // Handle selection
     }
 }
