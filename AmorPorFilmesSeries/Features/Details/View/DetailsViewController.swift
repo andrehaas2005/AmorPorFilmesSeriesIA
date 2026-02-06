@@ -351,21 +351,26 @@ class DetailsViewController: UIViewController {
 
     private func setupBindings() {
         viewModel.title.bind { [weak self] text in
+          guard let text = text else {return}
             self?.titleLabel.text = text
         }
         viewModel.imageUrl.bind { [weak self] url in
+          guard let url = url else {return}
             self?.backdropImage.kf.setImage(with: url, placeholder: UIImage(named: "movie-placeholder"))
         }
         viewModel.description.bind { [weak self] text in
+          guard let text = text else {return}
             self?.synopsisLabel.text = text
         }
         viewModel.providers.bind { [weak self] providers in
+          guard let providers = providers else {return}
             self?.updateProviders(providers)
         }
         viewModel.cast.bind { [weak self] _ in
             self?.castCollectionView.reloadData()
         }
         viewModel.episodes.bind { [weak self] episodes in
+          guard let episodes = episodes else {return}
             self?.updateEpisodes(episodes)
         }
         metadataLabel.text = "2024 • 2h 46m • Ficção Científica, Ação"
@@ -497,16 +502,23 @@ class DetailsViewController: UIViewController {
 
 extension DetailsViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.cast.value.count
+      return viewModel.cast.value?.count ?? 0
     }
 
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CastCell", for: indexPath) as! ActorCell
-        cell.configure(name: viewModel.cast.value[indexPath.item], imageURL: nil)
-        return cell
+  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CastCell",
+                                                        for: indexPath) as? ActorCell else { return UICollectionViewCell()}
+    
+    if let cast = viewModel.cast.value?[indexPath.item] {
+      cell.configure(name: cast, imageURL: nil)
     }
+    
+    return cell
+  }
 
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 80, height: 110)
     }
 }
