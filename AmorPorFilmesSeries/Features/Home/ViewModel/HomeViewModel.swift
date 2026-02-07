@@ -34,19 +34,20 @@ public class HomeViewModel: ViewModelProtocol {
 
         let dispatchGroup = DispatchGroup()
         dispatchGroup.enter()
-        movieService.fetchNowPlayingMovies { [weak self] result in
-            defer { dispatchGroup.leave() }
-            switch result {
-            case .success(let movies):
-                DispatchQueue.main.async {
-                    self?.items.value = movies
-                }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self?.errorMessage.value = "Erro ao carregar: \(error.localizedDescription)"
-                }
-            }
+      movieService.fetchNowPlayingMovies { [weak self] result in
+        defer { dispatchGroup.leave() }
+        guard let self = self else {return}
+        switch result {
+          case .success(let movies):
+          DispatchQueue.main.async {
+            self.items.value = movies
+          }
+        case .failure(let error):
+          DispatchQueue.main.async {
+            self.errorMessage.value = "Erro ao carregar: \(error.localizedDescription)"
+          }
         }
+      }
         
         dispatchGroup.notify(queue: .main) { [weak self] in
             self?.isLoading.value = false

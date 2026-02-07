@@ -34,7 +34,7 @@ class HomeViewController: UIViewController {
     }()
     
     private let posterHero: PosterCollectionView = {
-        let poster = PosterCollectionView(service: MockMovieService())
+        let poster = PosterCollectionView(service: MovieListService())
         return poster
     }()
 
@@ -88,8 +88,13 @@ class HomeViewController: UIViewController {
         setupUI()
         setupBindings()
         registerCollection()
-        viewModel.fetchData()
+        
     }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    viewModel.fetchData()
+  }
     
     private func setupTheme() {
         view.backgroundColor = Color.backgroundDark
