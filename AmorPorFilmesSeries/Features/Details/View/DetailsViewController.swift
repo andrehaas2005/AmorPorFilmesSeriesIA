@@ -140,6 +140,21 @@ class DetailsViewController: UIViewController {
         return cv
     }()
 
+    private let trailerSection = createSectionTitle("Trailer")
+    private let trailerContainer: UIView = {
+        let view = UIView()
+        view.layer.cornerRadius = 16
+        view.clipsToBounds = true
+        view.backgroundColor = .black.withAlphaComponent(0.4)
+        return view
+    }()
+    private let trailerThumbnail: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        return imageView
+    }()
+
     private let ratingSection = createSectionTitle("Sua Nota")
     private let ratingContainer: UIView = {
         let view = UIView()
@@ -165,6 +180,8 @@ class DetailsViewController: UIViewController {
         setupUI()
         setupBindings()
         setupNavigation()
+        updateSectionVisibility()
+        updateButtonLayout()
     }
 
     override func viewDidLayoutSubviews() {
@@ -184,11 +201,7 @@ class DetailsViewController: UIViewController {
     private func setupUI() {
         view.addSubview(scrollView)
         scrollView.snp.makeConstraints { make in
-//            make.edges.equalToSuperview()
-          make.top.equalTo(view.snp_topMargin)
-          make.leading.equalTo(view.snp_leadingMargin)
-          make.trailing.equalTo(view.snp_trailingMargin)
-          make.bottom.equalTo(view.snp_bottomMargin)
+            make.edges.equalToSuperview()
         }
 
         scrollView.addSubview(contentView)
@@ -200,7 +213,7 @@ class DetailsViewController: UIViewController {
         contentView.addSubview(backdropImage)
         backdropImage.snp.makeConstraints { make in
             make.top.leading.trailing.equalToSuperview()
-            make.height.equalTo(550)
+            make.height.equalTo(400)
         }
 
         backdropImage.addSubview(gradientView)
@@ -244,6 +257,7 @@ class DetailsViewController: UIViewController {
             seasonsSection, seasonsSegmentedControl,
             episodesStackView,
             castSection, castCollectionView,
+            trailerSection, trailerContainer,
             ratingSection, ratingContainer
         ])
         mainContentStack.axis = .vertical
@@ -254,6 +268,7 @@ class DetailsViewController: UIViewController {
         mainContentStack.setCustomSpacing(24, after: seasonsSegmentedControl)
         mainContentStack.setCustomSpacing(32, after: episodesStackView)
         mainContentStack.setCustomSpacing(24, after: castCollectionView)
+        mainContentStack.setCustomSpacing(24, after: trailerContainer)
 
         contentView.addSubview(mainContentStack)
         mainContentStack.snp.makeConstraints { make in
@@ -277,8 +292,13 @@ class DetailsViewController: UIViewController {
             make.height.equalTo(160)
         }
 
+        trailerContainer.snp.makeConstraints { make in
+            make.height.equalTo(200)
+        }
+
         setupRatingView()
         setupProgressView()
+        setupTrailerView()
     }
 
     private func setupProgressView() {
@@ -327,6 +347,110 @@ class DetailsViewController: UIViewController {
         }
     }
 
+    private func setupTrailerView() {
+        trailerContainer.addSubview(trailerThumbnail)
+        trailerThumbnail.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+
+        let overlay = UIView()
+        overlay.backgroundColor = .black.withAlphaComponent(0.4)
+        trailerContainer.addSubview(overlay)
+        overlay.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+
+        let playButton = UIView()
+        playButton.backgroundColor = Color.primary.withAlphaComponent(0.9)
+        playButton.layer.cornerRadius = 32
+
+        let playIcon = UIImageView(image: UIImage(systemName: "play.fill"))
+        playIcon.tintColor = .white
+        playButton.addSubview(playIcon)
+        playIcon.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.width.height.equalTo(32)
+        }
+
+        trailerContainer.addSubview(playButton)
+        playButton.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.width.height.equalTo(64)
+        }
+    }
+
+    private func updateButtonLayout() {
+        switch viewModel.detailType {
+        case .movie:
+            // Movies have 2 buttons in action stack + watchedButton below
+            // This is the default layout in setupUI
+            actionsStackView.addArrangedSubview(favoriteButton)
+            actionsStackView.addArrangedSubview(watchlistButton)
+            contentView.addSubview(watchedButton)
+            watchedButton.isHidden = false
+            watchedButton.snp.remakeConstraints { make in
+                make.top.equalTo(actionsStackView.snp.bottom).offset(12)
+                make.leading.trailing.equalToSuperview().inset(16)
+                make.height.equalTo(56)
+            }
+
+        case .serie:
+            // Series have 3 buttons in a single row
+            actionsStackView.addArrangedSubview(favoriteButton)
+            actionsStackView.addArrangedSubview(watchedButton)
+            actionsStackView.addArrangedSubview(watchlistButton)
+
+            // Adjust watchedButton appearance for stack view
+            watchedButton.isHidden = false
+            watchedButton.snp.remakeConstraints { make in
+                // Height is handled by stack view
+            }
+
+        case .actor:
+            actionsStackView.isHidden = true
+            watchedButton.isHidden = true
+        }
+    }
+
+    private func updateSectionVisibility() {
+        switch viewModel.detailType {
+        case .movie:
+            progressSection.isHidden = true
+            progressContainer.isHidden = true
+            seasonsSection.isHidden = true
+            seasonsSegmentedControl.isHidden = true
+            episodesStackView.isHidden = true
+
+            ratingSection.isHidden = false
+            ratingContainer.isHidden = false
+            trailerSection.isHidden = false
+            trailerContainer.isHidden = false
+
+        case .serie:
+            progressSection.isHidden = false
+            progressContainer.isHidden = false
+            seasonsSection.isHidden = false
+            seasonsSegmentedControl.isHidden = false
+            episodesStackView.isHidden = false
+
+            ratingSection.isHidden = true
+            ratingContainer.isHidden = true
+            trailerSection.isHidden = true
+            trailerContainer.isHidden = true
+
+        case .actor:
+            progressSection.isHidden = true
+            progressContainer.isHidden = true
+            seasonsSection.isHidden = true
+            seasonsSegmentedControl.isHidden = true
+            episodesStackView.isHidden = true
+            ratingSection.isHidden = true
+            ratingContainer.isHidden = true
+            trailerSection.isHidden = true
+            trailerContainer.isHidden = true
+        }
+    }
+
     private func setupRatingView() {
         let starsStack = UIStackView()
         starsStack.axis = .horizontal
@@ -355,29 +479,29 @@ class DetailsViewController: UIViewController {
 
     private func setupBindings() {
         viewModel.title.bind { [weak self] text in
-          guard let text = text else {return}
             self?.titleLabel.text = text
         }
         viewModel.imageUrl.bind { [weak self] url in
-          guard let url = url else {return}
             self?.backdropImage.kf.setImage(with: url, placeholder: UIImage(named: "movie-placeholder"))
         }
         viewModel.description.bind { [weak self] text in
-          guard let text = text else {return}
             self?.synopsisLabel.text = text
         }
         viewModel.providers.bind { [weak self] providers in
-          guard let providers = providers else {return}
             self?.updateProviders(providers)
         }
         viewModel.cast.bind { [weak self] _ in
             self?.castCollectionView.reloadData()
         }
         viewModel.episodes.bind { [weak self] episodes in
-          guard let episodes = episodes else {return}
             self?.updateEpisodes(episodes)
         }
-        metadataLabel.text = "2024 • 2h 46m • Ficção Científica, Ação"
+        viewModel.trailerImageUrl.bind { [weak self] url in
+            self?.trailerThumbnail.kf.setImage(with: url, placeholder: UIImage(named: "movie-placeholder"))
+        }
+        viewModel.metadata.bind { [weak self] text in
+            self?.metadataLabel.text = text
+        }
     }
 
     private func updateProviders(_ providers: [(name: String, color: String)]) {
@@ -506,23 +630,16 @@ class DetailsViewController: UIViewController {
 
 extension DetailsViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-      return viewModel.cast.value?.count ?? 0
+        return viewModel.cast.value.count
     }
 
-  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CastCell",
-                                                        for: indexPath) as? ActorCell else { return UICollectionViewCell()}
-    
-    if let cast = viewModel.cast.value?[indexPath.item] {
-      cell.configure(name: cast, imageURL: nil)
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CastCell", for: indexPath) as! ActorCell
+        cell.configure(name: viewModel.cast.value[indexPath.item], imageURL: nil)
+        return cell
     }
-    
-    return cell
-  }
 
-    func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 80, height: 110)
     }
 }

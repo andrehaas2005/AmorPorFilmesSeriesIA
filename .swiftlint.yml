@@ -23,6 +23,7 @@ opt_in_rules: # Regras para habilitar (a maioria não é por padrão)
   - identical_operands
   - implicit_getter
   - joined_default_parameter
+  - large_tuple
   - raw_value_for_camel_cased_codable_enum
   - modifier_order
   - multiline_parameters

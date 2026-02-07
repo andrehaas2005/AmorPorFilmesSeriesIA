@@ -27,7 +27,7 @@ class HomeCoordinator: Coordinator {
 
     /// Inicia o fluxo da Home.
     func start() {
-        let movieService = MovieListService() //Alterar para serviço real
+        let movieService = MockMovieService() //Alterar para serviço real
         
         let viewModel = HomeViewModel(movieService: movieService)
         viewModel.coordinator = self
@@ -47,6 +47,22 @@ class HomeCoordinator: Coordinator {
         childCoordinators.append(detailsCoordinator)
         detailsCoordinator.start(with: .movie(movie)) // Passa o filme para a tela de detalhes
     }
+
+//    /// Exibe os detalhes de uma série.
+//    func showSerieDetails(_ serie: Serie) {
+//        let detailsCoordinator = DetailsCoordinator(navigationController: navigationController)
+//        detailsCoordinator.parentCoordinator = self
+//        childCoordinators.append(detailsCoordinator)
+//        detailsCoordinator.start(with: .serie(serie)) // Passa a série para a tela de detalhes
+//    }
+//
+//    /// Exibe os detalhes de um ator.
+//    func showActorDetails(_ actor: Actor) {
+//        let detailsCoordinator = DetailsCoordinator(navigationController: navigationController)
+//        detailsCoordinator.parentCoordinator = self
+//        childCoordinators.append(detailsCoordinator)
+//        detailsCoordinator.start(with: .actor(actor)) // Passa o ator para a tela de detalhes
+//    }
 
     /// Remove um coordenador filho quando seu fluxo é concluído.
     func childDidFinish(_ child: Coordinator?) {
@@ -70,6 +86,14 @@ extension HomeCoordinator: HomeViewControllerDelegate {
     func didSelectMovie(_ movie: Movie) {
         showMovieDetails(movie)
     }
+
+//    func didSelectSerie(_ serie: Serie) {
+//        showSerieDetails(serie)
+//    }
+//
+//    func didSelectActor(_ actor: Actor) {
+//        showActorDetails(actor)
+//    }
 
     func didRequestLogout() {
         requestLogout()
