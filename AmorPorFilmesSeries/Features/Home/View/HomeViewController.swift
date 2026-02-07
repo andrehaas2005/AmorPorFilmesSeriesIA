@@ -34,7 +34,7 @@ class HomeViewController: UIViewController {
     }()
     
     private let posterHero: PosterCollectionView = {
-        let poster = PosterCollectionView(service: MockMovieService())
+        let poster = PosterCollectionView(service: MovieListService())
         return poster
     }()
 
@@ -88,8 +88,13 @@ class HomeViewController: UIViewController {
         setupUI()
         setupBindings()
         registerCollection()
-        viewModel.fetchData()
+        
     }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    viewModel.fetchData()
+  }
     
     private func setupTheme() {
         view.backgroundColor = Color.backgroundDark
@@ -121,7 +126,10 @@ class HomeViewController: UIViewController {
     private func setupUI() {
         view.addSubview(scrollView)
         scrollView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+          make.top.equalTo(view.snp_topMargin)
+          make.leading.equalTo(view.snp_leadingMargin)
+          make.trailing.equalTo(view.snp_trailingMargin)
+          make.bottom.equalTo(view.snp_bottomMargin)
         }
 
         scrollView.addSubview(mainStackView)
