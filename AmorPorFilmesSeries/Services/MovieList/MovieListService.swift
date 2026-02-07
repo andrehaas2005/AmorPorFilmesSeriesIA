@@ -9,7 +9,7 @@ import Foundation
 import ModuloServiceMovie
 
 class MovieListService: MovieServiceProtocol {
-    let service = NetworkService.shared
+    let service = NetworkMovieService.shared
     public static let shared = MovieListService()
     
     func fetchNowPlayingMovies(completion: @escaping (Result<[Movie], any Error>) -> Void) {
@@ -64,7 +64,8 @@ class MovieListService: MovieServiceProtocol {
     }
     
     func fetchNowPlayingMoviesWithTask(completion: @escaping (Result<[Movie], Error>) -> Void) async {
-        let request = APIRequest(path: "now_playing", method: .get)
+//        let request = APIRequest(path: "now_playing", method: .get)
+      let request = APIMovieRequest(path: .nowPlaying, method: .get)
         do {
             let response: Cover<Movie> = try await service.request(request)
             completion(.success(response.results))
@@ -74,7 +75,8 @@ class MovieListService: MovieServiceProtocol {
     }
     
     func fetchUpcomingMoviesWithTask(completion: @escaping (Result<[Movie], Error>) -> Void) async {
-        let request = APIRequest(path: "top_rated", method: .get)
+//        let request = APIRequest(path: "top_rated", method: .get)
+      let request = APIMovieRequest(path: .topRated, method: .get)
         do {
             let response: Cover<Movie> = try await service.request(request)
             completion(.success(response.results))
@@ -84,7 +86,8 @@ class MovieListService: MovieServiceProtocol {
     }
     
     func fetchRecentlyWatchedMoviesWithTask(completion: @escaping (Result<[Movie], Error>) -> Void) async {
-        let request = APIRequest(path: "upcoming", method: .get)
+//        let request = APIRequest(path: "upcoming", method: .get)
+      let request = APIMovieRequest(path: .upcoming, method: .get)
         do {
             let response: Cover<Movie> = try await service.request(request)
             completion(.success(response.results))

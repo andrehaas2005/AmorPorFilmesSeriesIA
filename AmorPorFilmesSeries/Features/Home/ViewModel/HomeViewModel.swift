@@ -1,10 +1,7 @@
 //
-//  Observable.swift
-//  PaixaoPorFilmesESeries
+//  HomeViewModel.swift
+//  AmorPorFilmesSeries
 //
-//  Created by Andre  Haas on 28/05/25.
-//
-
 
 import Foundation
 import ModuloServiceMovie
@@ -18,39 +15,44 @@ public class HomeViewModel: ViewModelProtocol {
     var errorMessage: Observable<String?> = Observable<String?>()
     weak var coordinator: HomeCoordinator?
     
+    // Additional data for enhanced Home Screen
+    var continueWatching: Observable<[(title: String, info: String, progress: Float, image: String)]> = Observable([])
+
     init(movieService: MovieServiceProtocol) {
         self.movieService = movieService
     }
     
     func fetchData() {
         isLoading.value = true
-        errorMessage.value = nil // Limpa mensagens de erro anteriores
+        errorMessage.value = nil
+
+        // Mock continue watching data
+        continueWatching.value = [
+            ("The Last of Us", "T1:E5 • 12m restantes", 0.8, "https://sl1nk.com/yLc9O"),
+            ("Breaking Bad", "T3:E10 • 32m restantes", 0.45, "https://sl1nk.com/BZgZl")
+        ]
+
         let dispatchGroup = DispatchGroup()
         dispatchGroup.enter()
-        DispatchQueue.global().async { [weak self] in
-            self?.movieService.fetchNowPlayingMovies { result in
-                defer { dispatchGroup.leave() }
-                switch result {
-                case .success(let movies):
-                    DispatchQueue.main.async {
-                        self?.items.value = movies
-                    }
-                case .failure(let error):
-                    DispatchQueue.main.async {
-                        self?.errorMessage.value = "Erro ao carregar filmes em cartaz: \(error.localizedDescription)"
-                    }
+        movieService.fetchNowPlayingMovies { [weak self] result in
+            defer { dispatchGroup.leave() }
+            switch result {
+            case .success(let movies):
+                DispatchQueue.main.async {
+                    self?.items.value = movies
+                }
+            case .failure(let error):
+                DispatchQueue.main.async {
+                    self?.errorMessage.value = "Erro ao carregar: \(error.localizedDescription)"
                 }
             }
         }
         
         dispatchGroup.notify(queue: .main) { [weak self] in
-            DispatchQueue.main.async {
-                self?.isLoading.value = false
-            }
+            self?.isLoading.value = false
         }
     }
     
-    /// Notifica o coordenador que um filme foi selecionado.
     func didSelectMovie(_ movie: Movie) {
         coordinator?.showMovieDetails(movie)
     }
