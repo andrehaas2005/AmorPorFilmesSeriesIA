@@ -126,7 +126,10 @@ class HomeViewController: UIViewController {
     private func setupUI() {
         view.addSubview(scrollView)
         scrollView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+          make.top.equalTo(view.snp_topMargin)
+          make.leading.equalTo(view.snp_leadingMargin)
+          make.trailing.equalTo(view.snp_trailingMargin)
+          make.bottom.equalTo(view.snp_bottomMargin)
         }
 
         scrollView.addSubview(mainStackView)
