@@ -207,18 +207,18 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1630;
-				LastUpgradeCheck = 1630;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					79BB3F9C2DE7D30800804CB4 = {
-						CreatedOnToolsVersion = 16.3;
+						CreatedOnToolsVersion = 16.0;
 					};
 					79BB3FB22DE7D30A00804CB4 = {
-						CreatedOnToolsVersion = 16.3;
+						CreatedOnToolsVersion = 16.0;
 						TestTargetID = 79BB3F9C2DE7D30800804CB4;
 					};
 					79BB3FBC2DE7D30A00804CB4 = {
-						CreatedOnToolsVersion = 16.3;
+						CreatedOnToolsVersion = 16.0;
 						TestTargetID = 79BB3F9C2DE7D30800804CB4;
 					};
 				};
@@ -441,7 +441,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -644,7 +644,7 @@
 			repositoryURL = "https://github.com/andrehaas2005/ModuloServiceSeries.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				minimumVersion = 2.0.0;
 			};
 		};
 		79E0443C2DE8F61F00E1D2F9 /* XCRemoteSwiftPackageReference "ModuloServiceMovie" */ = {
@@ -652,7 +652,7 @@
 			repositoryURL = "https://github.com/andrehaas2005/ModuloServiceMovie.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				minimumVersion = 2.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

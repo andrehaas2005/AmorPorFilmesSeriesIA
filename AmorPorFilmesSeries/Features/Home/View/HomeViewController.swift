@@ -11,54 +11,55 @@ import SnapKit
 
 protocol HomeViewControllerDelegate: AnyObject {
     func didSelectMovie(_ movie: Movie)
-    //    func didSelectSerie(_ serie: Serie)
-    //    func didSelectActor(_ actor: Actor)
     func didRequestLogout()
 }
 
-enum Section {
-    case main
-    case second
-}
-
-class HomeViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
+class HomeViewController: UIViewController {
     
     weak var delegate: HomeViewControllerDelegate?
     private let viewModel: HomeViewModel
     
-    
-    private let posterMovie: PosterCollectionView = {
-        let poster = PosterCollectionView(service: MockMovieService())
-        return poster
-    }()
-    
-    private let actorMovie: ActorsCollectionView = {
-        let actor = ActorsCollectionView(service: MockActorService())
-        return actor
-    }()
-    
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.contentInsetAdjustmentBehavior = .never
+        scrollView.showsVerticalScrollIndicator = false
         return scrollView
     }()
     
     private let mainStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
-        stackView.spacing = 20
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.isLayoutMarginsRelativeArrangement = true
+        stackView.spacing = 32
         return stackView
     }()
     
-    private let nowPlayingLabel = createSectionLabel("Filmes em Cartaz")
-    private let actorsLabel = createSectionLabel("Atores Populares")
-    
-    private let nowPlayingCollectionView: UICollectionView = {
+    private let posterHero: PosterCollectionView = {
+        let poster = PosterCollectionView(service: MockMovieService())
+        return poster
+    }()
+
+    private let continueWatchingLabel = createSectionLabel("CONTINUAR ASSISTINDO")
+    private let continueWatchingStackView: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = 12
+        return stack
+    }()
+
+    private let trendingLabel = createSectionLabel("TENDÊNCIAS DA SEMANA")
+    private let trendingCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        //        layout.estimatedItemSize = CGSize(width: 150, height: 200)
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .clear
+        collectionView.showsHorizontalScrollIndicator = false
+        return collectionView
+    }()
+    
+    private let recommendationsLabel = createSectionLabel("RECOMENDADO PARA VOCÊ")
+    private let recommendationsCollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         collectionView.showsHorizontalScrollIndicator = false
@@ -67,6 +68,7 @@ class HomeViewController: UIViewController, UICollectionViewDelegateFlowLayout, 
     
     private let activityIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .large)
+        indicator.color = Color.teal
         indicator.hidesWhenStopped = true
         return indicator
     }()
@@ -82,140 +84,156 @@ class HomeViewController: UIViewController, UICollectionViewDelegateFlowLayout, 
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = Color.primaryLight
-        title = "Próximos Lançamentos"
-        registerCollection()
-        setupLogoutButton()
-        setupUI() // Chama setupUI que adiciona posterMovie
+        setupTheme()
+        setupUI()
         setupBindings()
-        viewModel.fetchData() // Inicia a busca de dados para os outros carrosséis
-        // O PosterViewModel (dentro de PosterCollection) já chama seu próprio fetchPosterData()
+        registerCollection()
+        viewModel.fetchData()
     }
     
-    func setupLogoutButton() {
+    private func setupTheme() {
+        view.backgroundColor = Color.backgroundDark
+
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithTransparentBackground()
+        appearance.backgroundColor = Color.backgroundDark.withAlphaComponent(0.8)
+        appearance.backgroundEffect = UIBlurEffect(style: .dark)
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+
+        title = "Pipocando"
+
         if #available(iOS 13.0, *) {
-            let logoutImage = UIImage(systemName: "rectangle.portrait.and.arrow.right")
-            let logoutBarButtonItem = UIBarButtonItem(image: logoutImage, style: .plain,
-                                                      target: self, action: #selector(logoutTapped))
-            navigationItem.rightBarButtonItem = logoutBarButtonItem
-        } else {
-            if let logoutImage = UIImage(named: "logout_icon") {
-                let logoutBarButtonItem = UIBarButtonItem(image: logoutImage, style: .plain,
-                                                          target: self, action: #selector(logoutTapped))
-                navigationItem.rightBarButtonItem = logoutBarButtonItem
-            } else {
-                let logoutBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain,
-                                                          target: self, action: #selector(logoutTapped))
-                navigationItem.rightBarButtonItem = logoutBarButtonItem
-            }
+            let searchItem = UIBarButtonItem(image: UIImage(systemName: "magnifyingglass"), style: .plain, target: nil, action: nil)
+            let notifyItem = UIBarButtonItem(image: UIImage(systemName: "bell"), style: .plain, target: nil, action: nil)
+            searchItem.tintColor = .white.withAlphaComponent(0.4)
+            notifyItem.tintColor = .white.withAlphaComponent(0.4)
+            navigationItem.rightBarButtonItems = [notifyItem, searchItem]
+
+            let logoItem = UIBarButtonItem(image: UIImage(systemName: "movieclapper"), style: .plain, target: nil, action: nil)
+            logoItem.tintColor = Color.teal
+            navigationItem.leftBarButtonItem = logoItem
         }
-    }
-    
-    @objc func logoutTapped() {
-        delegate?.didRequestLogout()
-    }
-    
-    private func setupBindings() {
-        viewModel.isLoading.bind { [weak self] isLoading in
-            guard let self = self,
-                  let isLoading = isLoading else { return }
-            if isLoading {
-                self.activityIndicator.startAnimating()
-            } else {
-                self.activityIndicator.stopAnimating()
-            }
-        }
-        
-        viewModel.errorMessage.bind { [weak self] message in
-            guard let self = self,
-                  let message = message else { return }
-            let alert = UIAlertController(title: "Erro", message: message, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Ok", style: .default))
-            self.present(alert, animated: true)
-        }
-        
-        viewModel.items.bind { [weak self] _ in
-            self?.nowPlayingCollectionView.reloadData()
-        }
-    }
-    
-    private func registerCollection() {
-        nowPlayingCollectionView.delegate = self
-        nowPlayingCollectionView.dataSource = self
-        nowPlayingCollectionView.register(MovieCarouselCell.self,
-                                          forCellWithReuseIdentifier: MovieCarouselCell.identifier)
     }
     
     private func setupUI() {
         view.addSubview(scrollView)
+        scrollView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+
         scrollView.addSubview(mainStackView)
-        
-    
-        mainStackView.addArrangedSubview(posterMovie)
-        mainStackView.addArrangedSubview(nowPlayingLabel)
-        mainStackView.addArrangedSubview(nowPlayingCollectionView)
-        mainStackView.addArrangedSubview(actorsLabel)
-        mainStackView.addArrangedSubview(actorMovie)
-        
-        // Constraints para o UIScrollView
-        NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ])
-        
-        // Constraints para o UIStackView dentro do UIScrollView
-        NSLayoutConstraint.activate([
-            mainStackView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
-            mainStackView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
-            mainStackView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
-            mainStackView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
-            mainStackView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor)
-        ])
-        
-        posterMovie.snp.makeConstraints { make in
-            make.height.equalTo(350) // Altura do banner principal
-            make.leading.trailing.equalToSuperview()
+        mainStackView.snp.makeConstraints { make in
+            make.top.leading.trailing.bottom.equalTo(scrollView.contentLayoutGuide)
+            make.width.equalTo(scrollView.frameLayoutGuide)
         }
-        
-        actorMovie.snp.makeConstraints { make in
-            make.height.equalTo(150) // Altura do banner principal
-            make.leading.trailing.equalToSuperview()
+
+        mainStackView.addArrangedSubview(posterHero)
+        posterHero.snp.makeConstraints { make in
+            make.height.equalTo(view.snp.width).multipliedBy(1.25)
         }
-        
-        nowPlayingCollectionView.snp.makeConstraints { make in
-            make.height.equalTo(220)
-            make.leading.trailing.equalToSuperview()
+
+        let continueSection = createSectionStack(label: continueWatchingLabel, content: continueWatchingStackView)
+        mainStackView.addArrangedSubview(continueSection)
+
+        let trendingSection = createSectionStack(label: trendingLabel, content: trendingCollectionView)
+        mainStackView.addArrangedSubview(trendingSection)
+        trendingCollectionView.snp.makeConstraints { make in
+            make.height.equalTo(180)
         }
-        
-        // Adiciona e configura o activityIndicator
+
+        let recommendationsSection = createSectionStack(label: recommendationsLabel, content: recommendationsCollectionView)
+        mainStackView.addArrangedSubview(recommendationsSection)
+        recommendationsCollectionView.snp.makeConstraints { make in
+            make.height.equalTo(120)
+        }
+
+        let spacer = UIView()
+        spacer.snp.makeConstraints { make in make.height.equalTo(100) }
+        mainStackView.addArrangedSubview(spacer)
+
         view.addSubview(activityIndicator)
-        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
-        ])
+        activityIndicator.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+    }
+
+    private func createSectionStack(label: UILabel, content: UIView) -> UIStackView {
+        let stack = UIStackView(arrangedSubviews: [label, content])
+        stack.axis = .vertical
+        stack.spacing = 16
+        stack.isLayoutMarginsRelativeArrangement = true
+        stack.layoutMargins = UIEdgeInsets(top: 0, left: 24, bottom: 0, right: 24)
+        if content is UICollectionView {
+            stack.layoutMargins = UIEdgeInsets(top: 0, left: 24, bottom: 0, right: 0)
+        }
+        return stack
+    }
+    
+    private func setupBindings() {
+        viewModel.isLoading.bind { [weak self] isLoading in
+            DispatchQueue.main.async {
+                if isLoading == true {
+                    self?.activityIndicator.startAnimating()
+                } else {
+                    self?.activityIndicator.stopAnimating()
+                }
+            }
+        }
+        
+        viewModel.items.bind { [weak self] _ in
+            DispatchQueue.main.async {
+                self?.trendingCollectionView.reloadData()
+                self?.recommendationsCollectionView.reloadData()
+            }
+        }
+        
+        viewModel.continueWatching.bind { [weak self] items in
+            DispatchQueue.main.async {
+                self?.updateContinueWatching(items)
+            }
+        }
+    }
+    
+    private func updateContinueWatching(_ items: [(title: String, info: String, progress: Float, image: String)]) {
+        continueWatchingStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        for item in items {
+            let cell = ContinueWatchingCell()
+            cell.configure(title: item.title, info: item.info, progress: item.progress, imageURL: item.image)
+            cell.snp.makeConstraints { make in make.height.equalTo(88) }
+            continueWatchingStackView.addArrangedSubview(cell)
+        }
+    }
+    
+    private func registerCollection() {
+        [trendingCollectionView, recommendationsCollectionView].forEach { cv in
+            cv.delegate = self
+            cv.dataSource = self
+            cv.register(MovieCarouselCell.self, forCellWithReuseIdentifier: MovieCarouselCell.identifier)
+        }
     }
     
     private static func createSectionLabel(_ title: String) -> UILabel {
         let label = UILabel()
         label.text = title
-        label.font = UIFont.boldSystemFont(ofSize: 20)
-        label.textColor = .darkText
-        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 10, weight: .bold)
+        label.textColor = .white.withAlphaComponent(0.9)
+        let attributedString = NSMutableAttributedString(string: title)
+        attributedString.addAttribute(.kern, value: 1.5, range: NSRange(location: 0, length: title.count))
+        label.attributedText = attributedString
         return label
     }
-    
-    // MARK: - UICollectionViewDataSource (para nowPlayingCollectionView)
+}
+
+extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewModel.items.value?.count ?? 0
     }
     
-    func collectionView(_ collectionView: UICollectionView,
-                        cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieCarouselCell.identifier,
-                                                            for: indexPath) as? MovieCarouselCell else {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieCarouselCell.identifier, for: indexPath) as? MovieCarouselCell else {
             return UICollectionViewCell()
         }
         if let movie = viewModel.items.value?[indexPath.item] {
@@ -224,14 +242,12 @@ class HomeViewController: UIViewController, UICollectionViewDelegateFlowLayout, 
         return cell
     }
     
-    // MARK: - UICollectionViewDelegateFlowLayout (para nowPlayingCollectionView)
-    func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if collectionView == nowPlayingCollectionView {
-            return CGSize(width: 150, height: 220)
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        if collectionView == trendingCollectionView {
+            return CGSize(width: 100, height: 160)
+        } else {
+            return CGSize(width: 160, height: 100)
         }
-        return .zero // Retorno padrão para outras coleções
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {

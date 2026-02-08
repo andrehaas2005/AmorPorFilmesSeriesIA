@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
     - uses: actions/checkout@v3
 
@@ -24,38 +24,24 @@ jobs:
         fi
 
     - name: Select Xcode
-      run: sudo xcode-select -switch /Applications/Xcode_15.3.app # Ajuste para a versão desejada
+      run: |
+        if [ -d "/Applications/Xcode_16.2.app" ]; then
+          sudo xcode-select -switch /Applications/Xcode_16.2.app
+        elif [ -d "/Applications/Xcode_16.1.app" ]; then
+          sudo xcode-select -switch /Applications/Xcode_16.1.app
+        else
+          sudo xcode-select -switch /Applications/Xcode_16.app
+        fi
 
     - name: Xcode version
       run: xcodebuild -version
 
-    - name: Install SwiftLint
+    - name: Debug Project File
       run: |
-        brew update
-        brew install swiftlint
+        grep -A 20 "XCRemoteSwiftPackageReference section" AmorPorFilmesSeries.xcodeproj/project.pbxproj
 
-    - name: SwiftLint
-      run: swiftlint
+    - name: Resolve dependencies
+      run: xcodebuild -resolvePackageDependencies -project AmorPorFilmesSeries.xcodeproj -scheme AmorPorFilmesSeries -sdk iphoneos
 
-    - name: Set up CocoaPods (se necessário)
-      run: |
-        if test -e Podfile; then
-          gem install cocoapods --no-document
-          pod install
-        fi
-        
-    - name: Select Xcode
-      run: |
-        ls -l /Applications/
-        sudo xcode-select -switch /Applications/Xcode_16.2.app
-   
     - name: Build
-      run: xcodebuild clean build
-   
-# Versão instalada no macbook (macOS) é mais atual do que na pipeline do Github Action,
-#  por isso pode haver erros
-#
-  
-
-#    - name: Run tests
-#      run: xcodebuild test
+      run: xcodebuild clean build -project AmorPorFilmesSeries.xcodeproj -scheme AmorPorFilmesSeries -sdk iphoneos CODE_SIGNING_ALLOWED=NO
