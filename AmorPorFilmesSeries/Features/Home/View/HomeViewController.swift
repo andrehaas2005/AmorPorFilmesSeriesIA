@@ -88,7 +88,6 @@ class HomeViewController: UIViewController {
         setupUI()
         setupBindings()
         registerCollection()
-        
     }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -180,32 +179,32 @@ class HomeViewController: UIViewController {
         return stack
     }
     
-    private func setupBindings() {
-        viewModel.isLoading.bind { [weak self] isLoading in
-            DispatchQueue.main.async {
-                if isLoading == true {
-                    self?.activityIndicator.startAnimating()
-                } else {
-                    self?.activityIndicator.stopAnimating()
-                }
-            }
+  private func setupBindings() {
+    viewModel.isLoading.bind { [weak self] isLoading in
+      DispatchQueue.main.async {
+        if isLoading == true {
+          self?.activityIndicator.startAnimating()
+        } else {
+          self?.activityIndicator.stopAnimating()
         }
-        
-        viewModel.items.bind { [weak self] _ in
-            DispatchQueue.main.async {
-                self?.trendingCollectionView.reloadData()
-                self?.recommendationsCollectionView.reloadData()
-            }
-        }
-        
-        viewModel.continueWatching.bind { [weak self] items in
-          guard let items = items else {return}
-            DispatchQueue.main.async {
-                self?.updateContinueWatching(items)
-            }
-        }
+      }
     }
-  
+    
+    viewModel.items.bind { [weak self] _ in
+      DispatchQueue.main.async {
+        self?.trendingCollectionView.reloadData()
+        self?.recommendationsCollectionView.reloadData()
+      }
+    }
+    
+    viewModel.continueWatching.bind { [weak self] items in
+      guard let items = items else {return}
+      DispatchQueue.main.async {
+        self?.updateContinueWatching(items)
+      }
+    }
+  }
+  // swiftlint:disable large_tuple
     private func updateContinueWatching(_ items: [(title: String, info: String, progress: Float, image: String)]) {
         continueWatchingStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         for item in items {

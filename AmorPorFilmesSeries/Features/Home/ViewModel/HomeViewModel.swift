@@ -16,6 +16,7 @@ public class HomeViewModel: ViewModelProtocol {
     weak var coordinator: HomeCoordinator?
     
     // Additional data for enhanced Home Screen
+  // swiftlint:disable large_tuple
     var continueWatching: Observable<[(title: String, info: String, progress: Float, image: String)]> = Observable([])
 
     init(movieService: MovieServiceProtocol) {
@@ -28,8 +29,8 @@ public class HomeViewModel: ViewModelProtocol {
 
         // Mock continue watching data
         continueWatching.value = [
-            ("The Last of Us", "T1:E5 • 12m restantes", 0.8, "https://sl1nk.com/yLc9O"),
-            ("Breaking Bad", "T3:E10 • 32m restantes", 0.45, "https://sl1nk.com/BZgZl")
+            ("The Last of Us", "T1:E5 • 12m restantes", 0.8, "https://shre.ink/5mLW"),
+            ("Breaking Bad", "T3:E10 • 32m restantes", 0.45, "https://shre.ink/5mLl")
         ]
 
         let dispatchGroup = DispatchGroup()

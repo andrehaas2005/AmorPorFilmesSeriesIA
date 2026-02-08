@@ -24,10 +24,24 @@ jobs:
         fi
 
     - name: Select Xcode
-      run: sudo xcode-select -switch /Applications/Xcode_16.app
+      run: |
+        if [ -d "/Applications/Xcode_16.2.app" ]; then
+          sudo xcode-select -switch /Applications/Xcode_16.2.app
+        elif [ -d "/Applications/Xcode_16.1.app" ]; then
+          sudo xcode-select -switch /Applications/Xcode_16.1.app
+        else
+          sudo xcode-select -switch /Applications/Xcode_16.app
+        fi
 
     - name: Xcode version
       run: xcodebuild -version
+
+    - name: Debug Project File
+      run: |
+        grep -A 20 "XCRemoteSwiftPackageReference section" AmorPorFilmesSeries.xcodeproj/project.pbxproj
+
+    - name: Resolve dependencies
+      run: xcodebuild -resolvePackageDependencies -project AmorPorFilmesSeries.xcodeproj -scheme AmorPorFilmesSeries -sdk iphoneos
 
     - name: Build
       run: xcodebuild clean build -project AmorPorFilmesSeries.xcodeproj -scheme AmorPorFilmesSeries -sdk iphoneos CODE_SIGNING_ALLOWED=NO

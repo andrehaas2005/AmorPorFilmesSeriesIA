@@ -8,6 +8,7 @@ import Foundation
 class CalendarViewModel {
     weak var coordinator: CalendarCoordinator?
 
+  // swiftlint:disable large_tuple
     var dates: Observable<[(day: String, date: String, isSelected: Bool)]> = Observable([])
     var releases: Observable<[(title: String, episode: String, time: String, isFirst: Bool)]> = Observable([])
 

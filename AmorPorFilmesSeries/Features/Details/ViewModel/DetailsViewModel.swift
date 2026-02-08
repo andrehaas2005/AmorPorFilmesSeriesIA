@@ -11,6 +11,8 @@ class DetailsViewModel {
     let title = Observable<String?>(nil)
     let description = Observable<String?>(nil)
     let imageUrl = Observable<URL?>(nil)
+    let trailerImageUrl = Observable<URL?>(nil)
+    let metadata = Observable<String?>(nil)
 
     // Mock data for UI components
     let providers = Observable<[(name: String, color: String)]>([])
@@ -32,10 +34,14 @@ class DetailsViewModel {
             title.value = movie.title
             description.value = movie.overview
             imageUrl.value = URL(string: Configuration.imageBaseURL + movie.posterPath)
+            // Example metadata: "2024 • 2h 46m • Ficção Científica, Ação"
+            let year = movie.releaseDate.prefix(4)
+            metadata.value = "\(year) • 2h 46m • Ficção Científica, Ação"
         case .serie(let serie):
             title.value = serie.name
             description.value = serie.overview
             imageUrl.value =  URL(string: serie.posterPath)
+            metadata.value = "2023 • 2 Temporadas • Drama, Sci-Fi"
         case .actor(let actor):
             title.value = actor.name
             description.value = "Informações detalhadas sobre o ator."
@@ -50,6 +56,9 @@ class DetailsViewModel {
             ("Prime Video", "#00052d"),
             ("Apple TV", "#f5f5f7")
         ]
+
+        trailerImageUrl.value = URL(string: "https://shre.ink/5mLr")
+
 
         cast.value = [
             "Timothée Chalamet",
