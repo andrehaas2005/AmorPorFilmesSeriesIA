@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/andrehaas2005/ModuloServiceSeries.git",
       "state" : {
-        "revision" : "798d088334768e6f20338b8d5231f5f52381870b",
-        "version" : "2.0.0"
+        "branch" : "main",
+        "revision" : "798d088334768e6f20338b8d5231f5f52381870b"
       }
     },
     {
