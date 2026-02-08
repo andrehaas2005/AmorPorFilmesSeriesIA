@@ -57,7 +57,8 @@ class DetailsViewModel {
             ("Apple TV", "#f5f5f7")
         ]
 
-        trailerImageUrl.value = URL(string: "https://lh3.googleusercontent.com/aida-public/AB6AXuBnBaxDyoX1oK0kxhytkLlnFvPdbjlJ-n5FTSyvPmS008l79noVA3HLj9tIhgkywUbjlXtHd7WJlq20nVzCw-loY-5REaW8PW0IVf3PSnr-4w4D0kRTt_rJF5tPBh7G9tUKfiD9YLq5TE6DiF0X2chFaZYa8lIP9kbt68TDeug7fNgR6aQ0jg5hJ9IWi1sCswwOhVAiH1OGdsv9qdIinbLf0G9Vx-95sHyDAeLTkurJYLYXTkS_KaisWtCQ6Wr8IZr5Ke45MUIbbzE")
+        trailerImageUrl.value = URL(string: "https://shre.ink/5mLr")
+
 
         cast.value = [
             "Timothée Chalamet",

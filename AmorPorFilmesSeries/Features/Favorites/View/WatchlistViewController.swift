@@ -184,15 +184,22 @@ extension WatchlistViewController: UICollectionViewDataSource, UICollectionViewD
         return viewModel.items.value?.count ?? 0
     }
 
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WatchlistPosterCell.identifier, for: indexPath) as! WatchlistPosterCell
+    func collectionView(_ collectionView: UICollectionView,
+                        cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+      guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WatchlistPosterCell.identifier,
+                                                          for: indexPath) as? WatchlistPosterCell else {
+        return UICollectionViewCell()
+      }
+        
         if let item = viewModel.items.value?[indexPath.item] {
             cell.configure(title: item.title, rating: item.rating, imageURL: item.image)
         }
         return cell
     }
 
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
         let width = (collectionView.frame.width - 16 * 2 - 16) / 2
         return CGSize(width: width, height: width * 1.5 + 30)
     }

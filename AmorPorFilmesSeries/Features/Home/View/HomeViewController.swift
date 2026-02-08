@@ -34,7 +34,7 @@ class HomeViewController: UIViewController {
     }()
     
     private let posterHero: PosterCollectionView = {
-        let poster = PosterCollectionView(service: MockMovieService())
+        let poster = PosterCollectionView(service: MovieListService())
         return poster
     }()
 
@@ -88,8 +88,12 @@ class HomeViewController: UIViewController {
         setupUI()
         setupBindings()
         registerCollection()
-        viewModel.fetchData()
     }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    viewModel.fetchData()
+  }
     
     private func setupTheme() {
         view.backgroundColor = Color.backgroundDark
@@ -121,7 +125,10 @@ class HomeViewController: UIViewController {
     private func setupUI() {
         view.addSubview(scrollView)
         scrollView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+          make.top.equalTo(view.snp_topMargin)
+          make.leading.equalTo(view.snp_leadingMargin)
+          make.trailing.equalTo(view.snp_trailingMargin)
+          make.bottom.equalTo(view.snp_bottomMargin)
         }
 
         scrollView.addSubview(mainStackView)
@@ -172,31 +179,32 @@ class HomeViewController: UIViewController {
         return stack
     }
     
-    private func setupBindings() {
-        viewModel.isLoading.bind { [weak self] isLoading in
-            DispatchQueue.main.async {
-                if isLoading == true {
-                    self?.activityIndicator.startAnimating()
-                } else {
-                    self?.activityIndicator.stopAnimating()
-                }
-            }
+  private func setupBindings() {
+    viewModel.isLoading.bind { [weak self] isLoading in
+      DispatchQueue.main.async {
+        if isLoading == true {
+          self?.activityIndicator.startAnimating()
+        } else {
+          self?.activityIndicator.stopAnimating()
         }
-        
-        viewModel.items.bind { [weak self] _ in
-            DispatchQueue.main.async {
-                self?.trendingCollectionView.reloadData()
-                self?.recommendationsCollectionView.reloadData()
-            }
-        }
-        
-        viewModel.continueWatching.bind { [weak self] items in
-            DispatchQueue.main.async {
-                self?.updateContinueWatching(items)
-            }
-        }
+      }
     }
     
+    viewModel.items.bind { [weak self] _ in
+      DispatchQueue.main.async {
+        self?.trendingCollectionView.reloadData()
+        self?.recommendationsCollectionView.reloadData()
+      }
+    }
+    
+    viewModel.continueWatching.bind { [weak self] items in
+      guard let items = items else {return}
+      DispatchQueue.main.async {
+        self?.updateContinueWatching(items)
+      }
+    }
+  }
+  // swiftlint:disable large_tuple
     private func updateContinueWatching(_ items: [(title: String, info: String, progress: Float, image: String)]) {
         continueWatchingStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         for item in items {
@@ -228,31 +236,35 @@ class HomeViewController: UIViewController {
 }
 
 extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.items.value?.count ?? 0
-    }
+  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    return viewModel.items.value?.count ?? 0
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) ->
+  UICollectionViewCell {
+    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieCarouselCell.identifier,
+                                                        for: indexPath) as? MovieCarouselCell
+    else { return UICollectionViewCell() }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieCarouselCell.identifier, for: indexPath) as? MovieCarouselCell else {
-            return UICollectionViewCell()
-        }
-        if let movie = viewModel.items.value?[indexPath.item] {
-            cell.configure(with: movie)
-        }
-        return cell
+    if let movie = viewModel.items.value?[indexPath.item] {
+      cell.configure(with: movie)
     }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if collectionView == trendingCollectionView {
-            return CGSize(width: 100, height: 160)
-        } else {
-            return CGSize(width: 160, height: 100)
-        }
+    return cell
+  }
+  
+  func collectionView(_ collectionView: UICollectionView,
+                      layout collectionViewLayout: UICollectionViewLayout,
+                      sizeForItemAt indexPath: IndexPath) -> CGSize {
+    if collectionView == trendingCollectionView {
+      return CGSize(width: 100, height: 160)
+    } else {
+      return CGSize(width: 160, height: 100)
     }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let movie = viewModel.items.value?[indexPath.item] {
-            delegate?.didSelectMovie(movie)
-        }
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    if let movie = viewModel.items.value?[indexPath.item] {
+      delegate?.didSelectMovie(movie)
     }
+  }
 }

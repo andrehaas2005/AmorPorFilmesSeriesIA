@@ -192,19 +192,23 @@ class CalendarViewController: UIViewController {
 }
 
 extension CalendarViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView,
+                        numberOfItemsInSection section: Int) -> Int {
         return viewModel.dates.value?.count ?? 0
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "DateCell", for: indexPath) as! DateCell
+      guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "DateCell",
+                                                          for: indexPath) as? DateCell else { return UICollectionViewCell()}
         if let item = viewModel.dates.value?[indexPath.item] {
             cell.configure(day: item.day, date: item.date, isSelected: item.isSelected)
         }
         return cell
     }
 
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 56, height: 72)
     }
 }
@@ -215,9 +219,15 @@ extension CalendarViewController: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TimelineCell", for: indexPath) as! TimelineCell
+      guard let cell = tableView.dequeueReusableCell(withIdentifier: "TimelineCell",
+                                                     for: indexPath) as? TimelineCell else { return UITableViewCell()}
+        
         if let item = viewModel.releases.value?[indexPath.row] {
-            cell.configure(title: item.title, episode: item.episode, time: item.time, isFirst: item.isFirst, isLast: indexPath.row == (viewModel.releases.value?.count ?? 0) - 1)
+            cell.configure(title: item.title,
+                           episode: item.episode,
+                           time: item.time,
+                           isFirst: item.isFirst,
+                           isLast: indexPath.row == (viewModel.releases.value?.count ?? 0) - 1)
         }
         return cell
     }
