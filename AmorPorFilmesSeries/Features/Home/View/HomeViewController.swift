@@ -191,7 +191,6 @@ class HomeViewController: UIViewController {
         }
         
         viewModel.continueWatching.bind { [weak self] items in
-          guard let items = items else { return }
             DispatchQueue.main.async {
                 self?.updateContinueWatching(items)
             }
